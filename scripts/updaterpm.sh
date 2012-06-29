@@ -3,8 +3,8 @@
 #==============================================================================+
 # File name   : updaterpm.sh
 # Begin       : 2012-06-11
-# Last Update : 2012-06-28
-# Version     : 1.0.0
+# Last Update : 2012-06-29
+# Version     : 1.0.1
 #
 # Description : Update the RPM build host and rebuild all RPM packages.
 #
@@ -39,6 +39,9 @@ SQLITEFILEVER=3071300
 
 # reboot time
 REBOOTTIME=60
+
+# GIT root
+GITROOT=~/DATA/GIT
 
 echo "*** CatN RPM Builder (Nicola Asuni - 20120-06-28) ***"
 
@@ -185,16 +188,16 @@ echo "\n* Download files and update GIT ...\n"
 KVER=$(ssh root@$RPMHOST 'echo $(uname -r)')
 
 # create dir if not exist
-mkdir -p /home/nick/DATA/GIT/CatN-Repo/CentOS/$KVER
+mkdir -p $GITROOT/CatN-Repo/CentOS/$KVER
 
 # get the files
-scp root@$RPMHOST:/home/makerpm/rpmbuild/RPMS/x86_64/* /home/nick/DATA/GIT/CatN-Repo/CentOS/$KVER
+scp root@$RPMHOST:/home/makerpm/rpmbuild/RPMS/x86_64/* $GITROOT/CatN-Repo/CentOS/$KVER
 
 # remove local files
 ssh root@$RPMHOST 'rm -rf /home/makerpm/rpmbuild/RPMS/x86_64/*'
 
 # update git
-cd /home/nick/DATA/GIT/CatN-Repo
+cd $GITROOT/CatN-Repo
 git add .
 git commit -a -m "'CentOS $KVER'"
 git push -u origin master
