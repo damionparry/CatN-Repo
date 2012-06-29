@@ -6,7 +6,25 @@
 # Last Update : 2012-06-29
 # Version     : 1.0.1
 #
-# Description : Update the RPM build host and rebuild all RPM packages.
+# Description : This script rebuilds some RPM packages used on CatN Lab.
+#               To run this script you need a Virtual Machine (or physical 
+#               server) with a minimal CentOS 6 installation and your ssh key on
+#               the /root/.ssh/authorized_keys file.
+#               This script:
+#                - updates the remote CentOS machine;
+#                - install all the required packages;
+#                - build the RPM packages
+#                - transfer the RPMs on the GIT repository in your PC
+#                - push the modifications to the GitHub repository
+#                  https://github.com/fubralimited/CatN-Repo
+#
+# Installation : Install a local GIT repository on your machine
+#                ~/DATA/GIT/CatN-Repo
+#                and initialize it with the remote GIT repository
+#                https://github.com/fubralimited/CatN-Repo
+#                Update the IP of the building host machine (with CentOS 6 and 
+#                your ssh key on the /root/.ssh/authorized_keys file).
+#                Update the configuration parameters below to fit your case.
 #
 # Author: Nicola Asuni
 #
@@ -24,6 +42,8 @@
 # License:
 #    Copyright (C) 2012-2012 Fubra Limited
 #==============================================================================+
+
+# --- CONFIGURATION ---
 
 # target host (minimal CentOS 6 with your public key in /root/.ssh/authorized_keys file)
 RPMHOST=87.124.34.164
