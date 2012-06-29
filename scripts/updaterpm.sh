@@ -3,28 +3,10 @@
 #==============================================================================+
 # File name   : updaterpm.sh
 # Begin       : 2012-06-11
-# Last Update : 2012-06-29
-# Version     : 1.0.1
+# Last Update : 2012-06-28
+# Version     : 1.0.0
 #
-# Description : This script rebuilds some RPM packages used on CatN Lab.
-#               To run this script you need a Virtual Machine (or physical 
-#               server) with a minimal CentOS 6 installation and your ssh key on
-#               the /root/.ssh/authorized_keys file.
-#               This script:
-#                - updates the remote CentOS machine;
-#                - install all the required packages;
-#                - build the RPM packages
-#                - transfer the RPMs on the GIT repository in your PC
-#                - push the modifications to the GitHub repository
-#                  https://github.com/fubralimited/CatN-Repo
-#
-# Installation : Install a local GIT repository on your machine
-#                ~/DATA/GIT/CatN-Repo
-#                and initialize it with the remote GIT repository
-#                https://github.com/fubralimited/CatN-Repo
-#                Update the IP of the building host machine (with CentOS 6 and 
-#                your ssh key on the /root/.ssh/authorized_keys file).
-#                Update the configuration parameters below to fit your case.
+# Description : Update the RPM build host and rebuild all RPM packages.
 #
 # Author: Nicola Asuni
 #
@@ -43,8 +25,6 @@
 #    Copyright (C) 2012-2012 Fubra Limited
 #==============================================================================+
 
-# --- CONFIGURATION ---
-
 # target host (minimal CentOS 6 with your public key in /root/.ssh/authorized_keys file)
 RPMHOST=87.124.34.164
 
@@ -59,9 +39,6 @@ SQLITEFILEVER=3071300
 
 # reboot time
 REBOOTTIME=60
-
-# GIT root
-GITROOT=~/DATA/GIT
 
 echo "*** CatN RPM Builder (Nicola Asuni - 20120-06-28) ***"
 
@@ -202,25 +179,30 @@ ssh root@$RPMHOST "su -c 'cd /home/makerpm/rpmbuild/SPECS/ && rpmbuild -ba tcpwe
 # ..............................................................................
 # ..............................................................................
 
-echo "\n* Download files and update GIT ...\n"
+echo "\n* Updating GIT repository ...\n"
 
-# get the kernel version
-KVER=$(ssh root@$RPMHOST 'echo $(uname -r)')
+if ssh root@$RPMHOST 'ls /home/makerpm/RPM >/dev/null'; then
+	echo ""
+else
+	# create local RPM git repository
+	echo "move RPM files to specific kernel directory"
+	ssh root@$RPMHOST 'su -c "mkdir -p /home/makerpm/RPM/CentOS/$(uname -r)" makerpm'
+	scp README.md root@$RPMHOST:/home/makerpm/RPM/README.md
+	
+	#initialize GIT repository
+	ssh root@$RPMHOST 'cd /home/makerpm/RPM && git config --global user.name "Nicola Asuni"'
+	ssh root@$RPMHOST 'cd /home/makerpm/RPM && git config --global user.email nicola@fubra.com'
+	ssh root@$RPMHOST 'cd /home/makerpm/RPM && git init'
+	ssh root@$RPMHOST 'cd /home/makerpm/RPM && git add .'
+	ssh root@$RPMHOST 'cd /home/makerpm/RPM && git remote add origin git@github.com:fubralimited/CatN-Repo.git'
+fi
 
-# create dir if not exist
-mkdir -p $GITROOT/CatN-Repo/CentOS/$KVER
-
-# get the files
-scp root@$RPMHOST:/home/makerpm/rpmbuild/RPMS/x86_64/* $GITROOT/CatN-Repo/CentOS/$KVER
-
-# remove local files
-ssh root@$RPMHOST 'rm -rf /home/makerpm/rpmbuild/RPMS/x86_64/*'
+# move the RPM files to the local GIT repository
+ssh root@$RPMHOST 'su -c "mv /home/makerpm/rpmbuild/RPMS/x86_64/* /home/makerpm/RPM/CentOS/$(uname -r)" makerpm'
 
 # update git
-cd $GITROOT/CatN-Repo
-git add .
-git commit -a -m "'CentOS $KVER'"
-git push -u origin master
+ssh root@$RPMHOST 'cd /home/makerpm/RPM && git add . && git commit -a -m "CentOS $(uname -r)"'
+ssh -A root@$RPMHOST 'cd /home/makerpm/RPM && git push -u origin master'
 
 #==============================================================================+
 # END OF FILE
