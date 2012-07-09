@@ -13,10 +13,10 @@
 #               This script:
 #                - updates the remote CentOS machine;
 #                - install all the required packages;
-#                - build the RPM packages
-#                - transfer the RPMs on the GIT repository in your PC
+#                - build the RPM packages;
+#                - transfer the RPMs on the GIT repository in your PC;
 #                - push the modifications to the GitHub repository
-#                  https://github.com/fubralimited/CatN-Repo
+#                  https://github.com/fubralimited/CatN-Repo.
 #
 # Installation : Install a local GIT repository on your machine
 #                ~/DATA/GIT/CatN-Repo
@@ -46,7 +46,7 @@
 # --- CONFIGURATION ---
 
 # target host (minimal CentOS 6 with your public key in /root/.ssh/authorized_keys file)
-RPMHOST=10.0.2.15
+RPMHOST=87.124.34.153
 
 # SystemTap version (update also the systemtap.spec file - extract it from src.rpm fedora build)
 SYSTEMTAPVER=1.8
@@ -168,9 +168,9 @@ if ssh root@$RPMHOST 'ls /home/makerpm/ServerUsage >/dev/null'; then
 fi
 #download the source code from GitHub
 ssh root@$RPMHOST "su -c 'cd /home/makerpm && git clone git://github.com/fubralimited/ServerUsage.git' makerpm"
-ssh root@$RPMHOST 'cp /home/makerpm/ServerUsage/client/serverusage_client.spec /home/makerpm/rpmbuild/SPECS/'
+ssh root@$RPMHOST 'cp -u /home/makerpm/ServerUsage/client/serverusage_client.spec /home/makerpm/rpmbuild/SPECS/'
 ssh root@$RPMHOST 'export SUVER=$(cat /home/makerpm/ServerUsage/VERSION) && cd /home/makerpm/ServerUsage/client && tar -zcvf /home/makerpm/rpmbuild/SOURCES/serverusage_client-$SUVER.tar.gz *'
-ssh root@$RPMHOST 'cp /home/makerpm/ServerUsage/server/serverusage_server.spec /home/makerpm/rpmbuild/SPECS/'
+ssh root@$RPMHOST 'cp -u /home/makerpm/ServerUsage/server/serverusage_server.spec /home/makerpm/rpmbuild/SPECS/'
 ssh root@$RPMHOST 'export SUVER=$(cat /home/makerpm/ServerUsage/VERSION) && cd /home/makerpm/ServerUsage/server && tar -zcvf /home/makerpm/rpmbuild/SOURCES/serverusage_server-$SUVER.tar.gz *'
 ssh root@$RPMHOST "su -c 'cd /home/makerpm/rpmbuild/SPECS/ && rpmbuild -ba serverusage_client.spec' makerpm"
 ssh root@$RPMHOST "su -c 'cd /home/makerpm/rpmbuild/SPECS/ && rpmbuild -ba serverusage_server.spec' makerpm"
@@ -190,9 +190,9 @@ if ssh root@$RPMHOST 'ls /home/makerpm/TCPWebLog >/dev/null'; then
 fi
 #download the source code from GitHub
 ssh root@$RPMHOST "su -c 'cd /home/makerpm && git clone git://github.com/fubralimited/TCPWebLog.git' makerpm"
-ssh root@$RPMHOST 'cp /home/makerpm/TCPWebLog/client/tcpweblog_client.spec /home/makerpm/rpmbuild/SPECS/'
+ssh root@$RPMHOST 'cp -u /home/makerpm/TCPWebLog/client/tcpweblog_client.spec /home/makerpm/rpmbuild/SPECS/'
 ssh root@$RPMHOST 'export SUVER=$(cat /home/makerpm/TCPWebLog/VERSION) && cd /home/makerpm/TCPWebLog/client && tar -zcvf /home/makerpm/rpmbuild/SOURCES/tcpweblog_client-$SUVER.tar.gz *'
-ssh root@$RPMHOST 'cp /home/makerpm/TCPWebLog/server/tcpweblog_server.spec /home/makerpm/rpmbuild/SPECS/'
+ssh root@$RPMHOST 'cp -u /home/makerpm/TCPWebLog/server/tcpweblog_server.spec /home/makerpm/rpmbuild/SPECS/'
 ssh root@$RPMHOST 'export SUVER=$(cat /home/makerpm/TCPWebLog/VERSION) && cd /home/makerpm/TCPWebLog/server && tar -zcvf /home/makerpm/rpmbuild/SOURCES/tcpweblog_server-$SUVER.tar.gz *'
 ssh root@$RPMHOST "su -c 'cd /home/makerpm/rpmbuild/SPECS/ && rpmbuild -ba tcpweblog_client.spec' makerpm"
 ssh root@$RPMHOST "su -c 'cd /home/makerpm/rpmbuild/SPECS/ && rpmbuild -ba tcpweblog_server.spec' makerpm"
