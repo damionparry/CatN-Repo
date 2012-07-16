@@ -3,8 +3,8 @@
 #==============================================================================+
 # File name   : updaterpm.sh
 # Begin       : 2012-06-11
-# Last Update : 2012-06-29
-# Version     : 1.0.1
+# Last Update : 2012-07-16
+# Version     : 1.1.0
 #
 # Description : This script rebuilds some RPM packages used on CatN Lab.
 #               To run this script you need a Virtual Machine (or physical 
@@ -83,7 +83,7 @@ ssh root@$RPMHOST 'rpm -Uvh http://download.fedoraproject.org/pub/epel/6/$(uname
 
 # Install additional packages
 ssh root@$RPMHOST "yum -y groupinstall 'Development Tools'"
-ssh root@$RPMHOST 'yum -y install nano fedora-packager elfutils-devel kernel-devel dkms ncurses-devel readline-devel glibc-devel crash-devel rpm-devel nss-devel avahi-devel latex2html xmlto xmlto-tex publican publican-fedora gtkmm24-devel libglademm24-devel boost-devel dejagnu prelink nc socat glibc-devel glibc-devel.i686'
+ssh root@$RPMHOST 'yum -y install nano fedora-packager elfutils-devel kernel-devel dkms ncurses-devel readline-devel glibc-devel crash-devel rpm-devel nss-devel avahi-devel latex2html xmlto xmlto-tex publican publican-fedora gtkmm24-devel libglademm24-devel boost-devel dejagnu prelink nc socat glibc-devel glibc-devel.i686 php-devel'
  
 # download and install the latest debug modules for the current kernel
 if ssh root@$RPMHOST 'ls kernel-debug-debuginfo-$(uname -r).rpm >/dev/null'; then
@@ -199,6 +199,27 @@ ssh root@$RPMHOST "su -c 'cd /home/makerpm/rpmbuild/SPECS/ && rpmbuild -ba tcpwe
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+# *** LogPipe ***
+
+echo "\n* LogPipe ...\n"
+
+# delete old project (if any)
+if ssh root@$RPMHOST 'ls /home/makerpm/LogPipe >/dev/null'; then
+	# delete old dir
+	ssh root@$RPMHOST "rm -rf /home/makerpm/LogPipe"
+fi
+#download the source code from GitHub
+ssh root@$RPMHOST "su -c 'cd /home/makerpm && git clone git://github.com/fubralimited/LogPipe.git' makerpm"
+ssh root@$RPMHOST "su -c 'cd /home/makerpm/LogPipe && phpize' makerpm"
+ssh root@$RPMHOST "su -c 'cd /home/makerpm/LogPipe && ./configure --enable-logpipe' makerpm"
+ssh root@$RPMHOST "su -c 'cd /home/makerpm/LogPipe && make' makerpm"
+
+
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 # ..............................................................................
 # ..............................................................................
 
@@ -215,6 +236,10 @@ scp root@$RPMHOST:/home/makerpm/rpmbuild/RPMS/x86_64/* $GITROOT/CatN-Repo/CentOS
 
 # remove local files
 ssh root@$RPMHOST 'rm -rf /home/makerpm/rpmbuild/RPMS/x86_64/*'
+
+# copy LogPipe files
+scp root@$RPMHOST:/home/makerpm/LogPipe/logpipe.ini $GITROOT/CatN-Repo/CentOS/$KVER/LogPipe
+scp root@$RPMHOST:/home/makerpm/LogPipe/modules/logpipe.so $GITROOT/CatN-Repo/CentOS/$KVER/LogPipe
 
 # update git
 cd $GITROOT/CatN-Repo
