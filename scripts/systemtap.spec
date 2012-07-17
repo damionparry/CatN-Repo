@@ -20,7 +20,7 @@
 
 Name: systemtap
 Version: 1.8
-Release: 1%{?dist}
+Release: 4%{?dist}
 # for version, see also configure.ac
 
 
@@ -89,6 +89,9 @@ BuildRequires: publican
 BuildRequires: /usr/share/publican/Common_Content/%{publican_brand}/defaults.cfg
 %endif
 %endif
+
+Patch2: bz837641-staprun-no-linux-types.patch
+Patch3: PR14348.patch
 
 # Install requirements
 Requires: systemtap-client = %{version}-%{release}
@@ -224,8 +227,8 @@ Requires: avahi
 # testsuite/systemtap.base/crash.exp needs crash
 Requires: crash
 %endif
-%if %{_arch} == x86_64
-Requires: glibc-devel(%{__isa_name}-32)
+%ifarch x86_64
+Requires: /usr/lib/libc.so
 %endif
 
 %description testsuite
@@ -248,6 +251,10 @@ sleep 1
 find . \( -name configure -o -name config.h.in \) -print | xargs touch
 cd ..
 %endif
+
+# bz837641-staprun-no-linux-types.patch
+%patch2 -p1
+%patch3 -p1
 
 %build
 
@@ -579,6 +586,16 @@ exit 0
 # ------------------------------------------------------------------------
 
 %changelog
+* Fri Jul 13 2012 Peter Robinson <pbrobinson@fedoraproject.org> - 1.8-4
+- Fix ifarch statement
+- use file based requires for glibc-devel on x86_64 so that we work in koji
+
+* Wed Jul 11 2012 Frank Ch. Eigler <fche@redhat.com> - 1.8-3
+- PR14348 task_work_add race condition fix
+
+* Mon Jul 09 2012 Josh Stone <jistone@redhat.com>
+- bz837641 build fix
+
 * Sun Jun 17 2012 Frank Ch. Eigler <fche@redhat.com> - 1.8-1
 - Upstream release.
 
