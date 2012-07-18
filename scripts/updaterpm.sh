@@ -3,8 +3,8 @@
 #==============================================================================+
 # File name   : updaterpm.sh
 # Begin       : 2012-06-11
-# Last Update : 2012-07-17
-# Version     : 1.2.0
+# Last Update : 2012-07-18
+# Version     : 1.3.0
 #
 # Description : This script rebuilds some RPM packages used on CatN Lab.
 #               To run this script you need a Virtual Machine (or physical 
@@ -49,10 +49,10 @@
 RPMHOST=87.124.34.153
 
 # SystemTap version (update also the systemtap.spec file - extract it from src.rpm fedora build)
-SYSTEMTAPVER=1.8
+#SYSTEMTAPVER=1.8
 
 # SystemTap release (update also the systemtap.spec file - extract it from src.rpm fedora build)
-SYSTEMTAPREL=4
+#SYSTEMTAPREL=4
 
 # SQLite version (update also the sqlite.spec file)
 SQLITEVER=3.7.13
@@ -61,7 +61,7 @@ SQLITEVER=3.7.13
 SQLITEFILEVER=3071300
 
 # reboot time
-REBOOTTIME=60
+REBOOTTIME=120
 
 # GIT root
 GITROOT=~/DATA/GIT
@@ -141,15 +141,18 @@ ssh root@$RPMHOST "rpm -U --force /home/makerpm/rpmbuild/RPMS/x86_64/sqlite-$SQL
 
 echo "\n* SystemTap ...\n"
 # download source
-ssh root@$RPMHOST "su -c 'wget -O /home/makerpm/rpmbuild/SOURCES/systemtap-$SYSTEMTAPVER.tar.gz http://sourceware.org/systemtap/ftp/releases/systemtap-$SYSTEMTAPVER.tar.gz' makerpm"
+#ssh root@$RPMHOST "su -c 'wget -O /home/makerpm/rpmbuild/SOURCES/systemtap-$SYSTEMTAPVER.tar.gz http://sourceware.org/systemtap/ftp/releases/systemtap-$SYSTEMTAPVER.tar.gz' makerpm"
 # upload spec file
-scp systemtap.spec root@$RPMHOST:/home/makerpm/rpmbuild/SPECS/systemtap.spec
+#scp systemtap.spec root@$RPMHOST:/home/makerpm/rpmbuild/SPECS/systemtap.spec
 # patches !!!
-scp PR14348.patch root@$RPMHOST:/home/makerpm/rpmbuild/SOURCES/PR14348.patch
-scp bz837641-staprun-no-linux-types.patch root@$RPMHOST:/home/makerpm/rpmbuild/SOURCES/bz837641-staprun-no-linux-types.patch
+#scp PR14348.patch root@$RPMHOST:/home/makerpm/rpmbuild/SOURCES/PR14348.patch
+#scp bz837641-staprun-no-linux-types.patch root@$RPMHOST:/home/makerpm/rpmbuild/SOURCES/bz837641-staprun-no-linux-types.patch
 # build the RPM packages
-ssh root@$RPMHOST "su -c 'cd /home/makerpm/rpmbuild/SPECS && rpmbuild -ba systemtap.spec' makerpm"
-ssh root@$RPMHOST 'rpm -U --force /home/makerpm/rpmbuild/RPMS/x86_64/systemtap-$SYSTEMTAPVER-$SYSTEMTAPREL.el6.$(uname -m).rpm /home/makerpm/rpmbuild/RPMS/x86_64/systemtap-client-$SYSTEMTAPVER-$SYSTEMTAPREL.el6.$(uname -m).rpm /home/makerpm/rpmbuild/RPMS/x86_64/systemtap-debuginfo-$SYSTEMTAPVER-$SYSTEMTAPREL.el6.$(uname -m).rpm /home/makerpm/rpmbuild/RPMS/x86_64/systemtap-devel-$SYSTEMTAPVER-$SYSTEMTAPREL.el6.$(uname -m).rpm /home/makerpm/rpmbuild/RPMS/x86_64/systemtap-initscript-$SYSTEMTAPVER-$SYSTEMTAPREL.el6.$(uname -m).rpm /home/makerpm/rpmbuild/RPMS/x86_64/systemtap-runtime-$SYSTEMTAPVER-$SYSTEMTAPREL.el6.$(uname -m).rpm /home/makerpm/rpmbuild/RPMS/x86_64/systemtap-sdt-devel-$SYSTEMTAPVER-$SYSTEMTAPREL.el6.$(uname -m).rpm /home/makerpm/rpmbuild/RPMS/x86_64/systemtap-server-$SYSTEMTAPVER-$SYSTEMTAPREL.el6.$(uname -m).rpm /home/makerpm/rpmbuild/RPMS/x86_64/systemtap-testsuite-$SYSTEMTAPVER-$SYSTEMTAPREL.el6.$(uname -m).rpm'
+#ssh root@$RPMHOST "su -c 'cd /home/makerpm/rpmbuild/SPECS && rpmbuild -ba systemtap.spec' makerpm"
+#ssh root@$RPMHOST 'rpm -U --force /home/makerpm/rpmbuild/RPMS/x86_64/systemtap-$SYSTEMTAPVER-$SYSTEMTAPREL.el6.$(uname -m).rpm /home/makerpm/rpmbuild/RPMS/x86_64/systemtap-client-$SYSTEMTAPVER-$SYSTEMTAPREL.el6.$(uname -m).rpm /home/makerpm/rpmbuild/RPMS/x86_64/systemtap-debuginfo-$SYSTEMTAPVER-$SYSTEMTAPREL.el6.$(uname -m).rpm /home/makerpm/rpmbuild/RPMS/x86_64/systemtap-devel-$SYSTEMTAPVER-$SYSTEMTAPREL.el6.$(uname -m).rpm /home/makerpm/rpmbuild/RPMS/x86_64/systemtap-initscript-$SYSTEMTAPVER-$SYSTEMTAPREL.el6.$(uname -m).rpm /home/makerpm/rpmbuild/RPMS/x86_64/systemtap-runtime-$SYSTEMTAPVER-$SYSTEMTAPREL.el6.$(uname -m).rpm /home/makerpm/rpmbuild/RPMS/x86_64/systemtap-sdt-devel-$SYSTEMTAPVER-$SYSTEMTAPREL.el6.$(uname -m).rpm /home/makerpm/rpmbuild/RPMS/x86_64/systemtap-server-$SYSTEMTAPVER-$SYSTEMTAPREL.el6.$(uname -m).rpm /home/makerpm/rpmbuild/RPMS/x86_64/systemtap-testsuite-$SYSTEMTAPVER-$SYSTEMTAPREL.el6.$(uname -m).rpm'
+
+#install SystemTap from default repositories
+ssh root@$RPMHOST 'yum -y install systemtap systemtap-client systemtap-devel systemtap-runtime systemtap-initscript systemtap-grapher systemtap-sdt-devel systemtap-server systemtap-testsuite'
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
