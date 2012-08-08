@@ -46,7 +46,7 @@
 # --- CONFIGURATION ---
 
 # target host (minimal CentOS 6 with your public key in /root/.ssh/authorized_keys file)
-RPMHOST=87.124.34.153
+RPMHOST=87.124.34.161
 
 # SystemTap version (update also the systemtap.spec file - extract it from src.rpm fedora build)
 #SYSTEMTAPVER=1.8
@@ -236,7 +236,7 @@ echo "\n* Download files and update GIT ...\n"
 KVER=$(ssh root@$RPMHOST 'echo $(uname -r)')
 
 # create dir if not exist
-mkdir -p $GITROOT/CatN-Repo/CentOS/$KVER
+mkdir -p $GITROOT/CatN-Repo/CentOS/$KVER/LogPipe
 
 # get the files
 scp root@$RPMHOST:/home/makerpm/rpmbuild/RPMS/x86_64/* $GITROOT/CatN-Repo/CentOS/$KVER
