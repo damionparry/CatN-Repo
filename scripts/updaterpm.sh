@@ -3,8 +3,8 @@
 #==============================================================================+
 # File name   : updaterpm.sh
 # Begin       : 2012-06-11
-# Last Update : 2012-08-10
-# Version     : 1.4.0
+# Last Update : 2012-08-16
+# Version     : 1.5.0
 #
 # Description : This script rebuilds some RPM packages used on CatN Lab.
 #               To run this script you need a Virtual Machine (or physical 
@@ -177,12 +177,16 @@ if ssh root@$RPMHOST 'ls /home/makerpm/ServerUsage >/dev/null'; then
 fi
 #download the source code from GitHub
 ssh root@$RPMHOST "su -c 'cd /home/makerpm && git clone git://github.com/fubralimited/ServerUsage.git' makerpm"
-ssh root@$RPMHOST 'cp -u /home/makerpm/ServerUsage/client/serverusage_client.spec /home/makerpm/rpmbuild/SPECS/'
-ssh root@$RPMHOST 'export SUVER=$(cat /home/makerpm/ServerUsage/VERSION) && cd /home/makerpm/ServerUsage/client && tar -zcvf /home/makerpm/rpmbuild/SOURCES/serverusage_client-$SUVER.tar.gz *'
 ssh root@$RPMHOST 'cp -u /home/makerpm/ServerUsage/server/serverusage_server.spec /home/makerpm/rpmbuild/SPECS/'
 ssh root@$RPMHOST 'export SUVER=$(cat /home/makerpm/ServerUsage/VERSION) && cd /home/makerpm/ServerUsage/server && tar -zcvf /home/makerpm/rpmbuild/SOURCES/serverusage_server-$SUVER.tar.gz *'
-ssh root@$RPMHOST "su -c 'cd /home/makerpm/rpmbuild/SPECS/ && rpmbuild -ba serverusage_client.spec' makerpm"
+ssh root@$RPMHOST 'cp -u /home/makerpm/ServerUsage/client/serverusage_client.spec /home/makerpm/rpmbuild/SPECS/'
+ssh root@$RPMHOST 'export SUVER=$(cat /home/makerpm/ServerUsage/VERSION) && cd /home/makerpm/ServerUsage/client && tar -zcvf /home/makerpm/rpmbuild/SOURCES/serverusage_client-$SUVER.tar.gz *'
+ssh root@$RPMHOST 'cp -u /home/makerpm/ServerUsage/client_mdb/serverusage_client_mdb.spec /home/makerpm/rpmbuild/SPECS/'
+ssh root@$RPMHOST 'cp -u /home/makerpm/ServerUsage/client/serverusage_tcpsender.c /home/makerpm/ServerUsage/client_mdb/'
+ssh root@$RPMHOST 'export SUVER=$(cat /home/makerpm/ServerUsage/VERSION) && cd /home/makerpm/ServerUsage/client_mdb && tar -zcvf /home/makerpm/rpmbuild/SOURCES/serverusage_client_mdb-$SUVER.tar.gz *'
 ssh root@$RPMHOST "su -c 'cd /home/makerpm/rpmbuild/SPECS/ && rpmbuild -ba serverusage_server.spec' makerpm"
+ssh root@$RPMHOST "su -c 'cd /home/makerpm/rpmbuild/SPECS/ && rpmbuild -ba serverusage_client.spec' makerpm"
+ssh root@$RPMHOST "su -c 'cd /home/makerpm/rpmbuild/SPECS/ && rpmbuild -ba serverusage_client_mdb.spec' makerpm"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
