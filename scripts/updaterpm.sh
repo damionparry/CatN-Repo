@@ -3,7 +3,7 @@
 #==============================================================================+
 # File name   : updaterpm.sh
 # Begin       : 2012-06-11
-# Last Update : 2012-08-16
+# Last Update : 2012-08-20
 # Version     : 1.5.0
 #
 # Description : This script rebuilds some RPM packages used on CatN Lab.
@@ -46,7 +46,7 @@
 # --- CONFIGURATION ---
 
 # target host (minimal CentOS 6 with your public key in /root/.ssh/authorized_keys file)
-RPMHOST=127.0.0.1
+RPMHOST=87.124.34.161
 
 # SystemTap version (update also the systemtap.spec file - extract it from src.rpm fedora build)
 #SYSTEMTAPVER=1.8
@@ -61,7 +61,7 @@ SQLITEVER=3.7.13
 SQLITEFILEVER=3071300
 
 # reboot time
-REBOOTTIME=120
+REBOOTTIME=60
 
 # GIT root
 GITROOT=~/DATA/GIT
@@ -80,14 +80,26 @@ ssh root@$RPMHOST 'reboot'
 echo "waiting for reboot to complete"
 sleep $REBOOTTIME
 
+# set MariaDB repository
+if ssh root@$RPMHOST 'ls /etc/yum.repos.d/MariaDB.repo >/dev/null'; then
+	echo "MariaDB repository already installed"
+else
+	ssh root@$RPMHOST 'rpm --import http://yum.mariadb.org/RPM-GPG-KEY-MariaDB'
+	ssh root@$RPMHOST 'touch /etc/yum.repos.d/MariaDB.repo'
+	ssh root@$RPMHOST 'echo "[mariadb]" >> /etc/yum.repos.d/MariaDB.repo'
+	ssh root@$RPMHOST 'echo "name = MariaDB" >> /etc/yum.repos.d/MariaDB.repo'
+	ssh root@$RPMHOST 'echo "baseurl = http://yum.mariadb.org/5.5/centos6-amd64/" >> /etc/yum.repos.d/MariaDB.repo'
+	ssh root@$RPMHOST 'echo "gpgcheck=1" >> /etc/yum.repos.d/MariaDB.repo'
+fi
+
 # install EPEL repository
 echo "install various packages (if missing)"
 ssh root@$RPMHOST 'rpm -Uvh http://download.fedoraproject.org/pub/epel/6/$(uname -m)/epel-release-6-7.noarch.rpm'
 
 # Install additional packages
 ssh root@$RPMHOST "yum -y groupinstall 'Development Tools'"
-ssh root@$RPMHOST 'yum -y install nano fedora-packager elfutils-devel kernel-devel dkms ncurses-devel readline-devel glibc-devel crash-devel rpm-devel nss-devel avahi-devel latex2html xmlto xmlto-tex publican publican-fedora gtkmm24-devel libglademm24-devel boost-devel dejagnu prelink nc socat glibc-devel glibc-devel.i686 php-devel'
- 
+ssh root@$RPMHOST 'yum -y install nano fedora-packager elfutils-devel kernel-devel dkms ncurses-devel readline-devel glibc-devel crash-devel rpm-devel nss-devel avahi-devel latex2html xmlto xmlto-tex publican publican-fedora gtkmm24-devel libglademm24-devel boost-devel dejagnu prelink nc socat glibc-devel glibc-devel.i686 php-devel openssl-devel MariaDB-devel'
+
 # download and install the latest debug modules for the current kernel
 if ssh root@$RPMHOST 'ls kernel-debug-debuginfo-$(uname -r).rpm >/dev/null'; then
 	# kernel debug modules are alredy updated
@@ -177,12 +189,12 @@ if ssh root@$RPMHOST 'ls /home/makerpm/ServerUsage >/dev/null'; then
 fi
 #download the source code from GitHub
 ssh root@$RPMHOST "su -c 'cd /home/makerpm && git clone git://github.com/fubralimited/ServerUsage.git' makerpm"
-ssh root@$RPMHOST 'cp -u /home/makerpm/ServerUsage/server/serverusage_server.spec /home/makerpm/rpmbuild/SPECS/'
+ssh root@$RPMHOST 'cp -uf /home/makerpm/ServerUsage/server/serverusage_server.spec /home/makerpm/rpmbuild/SPECS/'
 ssh root@$RPMHOST 'export SUVER=$(cat /home/makerpm/ServerUsage/VERSION) && cd /home/makerpm/ServerUsage/server && tar -zcvf /home/makerpm/rpmbuild/SOURCES/serverusage_server-$SUVER.tar.gz *'
-ssh root@$RPMHOST 'cp -u /home/makerpm/ServerUsage/client/serverusage_client.spec /home/makerpm/rpmbuild/SPECS/'
+ssh root@$RPMHOST 'cp -uf /home/makerpm/ServerUsage/client/serverusage_client.spec /home/makerpm/rpmbuild/SPECS/'
 ssh root@$RPMHOST 'export SUVER=$(cat /home/makerpm/ServerUsage/VERSION) && cd /home/makerpm/ServerUsage/client && tar -zcvf /home/makerpm/rpmbuild/SOURCES/serverusage_client-$SUVER.tar.gz *'
-ssh root@$RPMHOST 'cp -u /home/makerpm/ServerUsage/client_mdb/serverusage_client_mdb.spec /home/makerpm/rpmbuild/SPECS/'
-ssh root@$RPMHOST 'cp -u /home/makerpm/ServerUsage/client/serverusage_tcpsender.c /home/makerpm/ServerUsage/client_mdb/'
+ssh root@$RPMHOST 'cp -uf /home/makerpm/ServerUsage/client_mdb/serverusage_client_mdb.spec /home/makerpm/rpmbuild/SPECS/'
+ssh root@$RPMHOST 'cp -uf /home/makerpm/ServerUsage/client/serverusage_tcpsender.c /home/makerpm/ServerUsage/client_mdb/'
 ssh root@$RPMHOST 'export SUVER=$(cat /home/makerpm/ServerUsage/VERSION) && cd /home/makerpm/ServerUsage/client_mdb && tar -zcvf /home/makerpm/rpmbuild/SOURCES/serverusage_client_mdb-$SUVER.tar.gz *'
 ssh root@$RPMHOST "su -c 'cd /home/makerpm/rpmbuild/SPECS/ && rpmbuild -ba serverusage_server.spec' makerpm"
 ssh root@$RPMHOST "su -c 'cd /home/makerpm/rpmbuild/SPECS/ && rpmbuild -ba serverusage_client.spec' makerpm"
@@ -203,9 +215,9 @@ if ssh root@$RPMHOST 'ls /home/makerpm/TCPWebLog >/dev/null'; then
 fi
 #download the source code from GitHub
 ssh root@$RPMHOST "su -c 'cd /home/makerpm && git clone git://github.com/fubralimited/TCPWebLog.git' makerpm"
-ssh root@$RPMHOST 'cp -u /home/makerpm/TCPWebLog/client/tcpweblog_client.spec /home/makerpm/rpmbuild/SPECS/'
+ssh root@$RPMHOST 'cp -uf /home/makerpm/TCPWebLog/client/tcpweblog_client.spec /home/makerpm/rpmbuild/SPECS/'
 ssh root@$RPMHOST 'export SUVER=$(cat /home/makerpm/TCPWebLog/VERSION) && cd /home/makerpm/TCPWebLog/client && tar -zcvf /home/makerpm/rpmbuild/SOURCES/tcpweblog_client-$SUVER.tar.gz *'
-ssh root@$RPMHOST 'cp -u /home/makerpm/TCPWebLog/server/tcpweblog_server.spec /home/makerpm/rpmbuild/SPECS/'
+ssh root@$RPMHOST 'cp -uf /home/makerpm/TCPWebLog/server/tcpweblog_server.spec /home/makerpm/rpmbuild/SPECS/'
 ssh root@$RPMHOST 'export SUVER=$(cat /home/makerpm/TCPWebLog/VERSION) && cd /home/makerpm/TCPWebLog/server && tar -zcvf /home/makerpm/rpmbuild/SOURCES/tcpweblog_server-$SUVER.tar.gz *'
 ssh root@$RPMHOST "su -c 'cd /home/makerpm/rpmbuild/SPECS/ && rpmbuild -ba tcpweblog_client.spec' makerpm"
 ssh root@$RPMHOST "su -c 'cd /home/makerpm/rpmbuild/SPECS/ && rpmbuild -ba tcpweblog_server.spec' makerpm"
