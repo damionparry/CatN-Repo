@@ -46,7 +46,7 @@
 # --- CONFIGURATION ---
 
 # target host (minimal CentOS 6 with your public key in /root/.ssh/authorized_keys file)
-RPMHOST=87.124.34.161
+RPMHOST=127.0.0.1
 
 # SystemTap version (update also the systemtap.spec file - extract it from src.rpm fedora build)
 #SYSTEMTAPVER=1.8
