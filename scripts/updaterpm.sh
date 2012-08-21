@@ -3,8 +3,8 @@
 #==============================================================================+
 # File name   : updaterpm.sh
 # Begin       : 2012-06-11
-# Last Update : 2012-08-20
-# Version     : 1.5.0
+# Last Update : 2012-08-21
+# Version     : 1.6.0
 #
 # Description : This script rebuilds some RPM packages used on CatN Lab.
 #               To run this script you need a Virtual Machine (or physical 
@@ -163,7 +163,7 @@ echo "\n* SystemTap ...\n"
 #ssh root@$RPMHOST "su -c 'cd /home/makerpm/rpmbuild/SPECS && rpmbuild -ba systemtap.spec' makerpm"
 #ssh root@$RPMHOST 'rpm -U --force /home/makerpm/rpmbuild/RPMS/x86_64/systemtap-$SYSTEMTAPVER-$SYSTEMTAPREL.el6.$(uname -m).rpm /home/makerpm/rpmbuild/RPMS/x86_64/systemtap-client-$SYSTEMTAPVER-$SYSTEMTAPREL.el6.$(uname -m).rpm /home/makerpm/rpmbuild/RPMS/x86_64/systemtap-debuginfo-$SYSTEMTAPVER-$SYSTEMTAPREL.el6.$(uname -m).rpm /home/makerpm/rpmbuild/RPMS/x86_64/systemtap-devel-$SYSTEMTAPVER-$SYSTEMTAPREL.el6.$(uname -m).rpm /home/makerpm/rpmbuild/RPMS/x86_64/systemtap-initscript-$SYSTEMTAPVER-$SYSTEMTAPREL.el6.$(uname -m).rpm /home/makerpm/rpmbuild/RPMS/x86_64/systemtap-runtime-$SYSTEMTAPVER-$SYSTEMTAPREL.el6.$(uname -m).rpm /home/makerpm/rpmbuild/RPMS/x86_64/systemtap-sdt-devel-$SYSTEMTAPVER-$SYSTEMTAPREL.el6.$(uname -m).rpm /home/makerpm/rpmbuild/RPMS/x86_64/systemtap-server-$SYSTEMTAPVER-$SYSTEMTAPREL.el6.$(uname -m).rpm /home/makerpm/rpmbuild/RPMS/x86_64/systemtap-testsuite-$SYSTEMTAPVER-$SYSTEMTAPREL.el6.$(uname -m).rpm'
 
-#install SystemTap from default repositories
+# install SystemTap from default repositories
 ssh root@$RPMHOST 'yum -y install systemtap systemtap-client systemtap-devel systemtap-runtime systemtap-initscript systemtap-grapher systemtap-sdt-devel systemtap-server systemtap-testsuite'
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -187,7 +187,7 @@ if ssh root@$RPMHOST 'ls /home/makerpm/ServerUsage >/dev/null'; then
 	# delete old dir
 	ssh root@$RPMHOST 'rm -rf /home/makerpm/ServerUsage'
 fi
-#download the source code from GitHub
+# download the source code from GitHub
 ssh root@$RPMHOST "su -c 'cd /home/makerpm && git clone git://github.com/fubralimited/ServerUsage.git' makerpm"
 ssh root@$RPMHOST 'cp -uf /home/makerpm/ServerUsage/server/serverusage_server.spec /home/makerpm/rpmbuild/SPECS/'
 ssh root@$RPMHOST 'export SUVER=$(cat /home/makerpm/ServerUsage/VERSION) && cd /home/makerpm/ServerUsage/server && tar -zcvf /home/makerpm/rpmbuild/SOURCES/serverusage_server-$SUVER.tar.gz *'
@@ -213,7 +213,7 @@ if ssh root@$RPMHOST 'ls /home/makerpm/TCPWebLog >/dev/null'; then
 	# delete old dir
 	ssh root@$RPMHOST "rm -rf /home/makerpm/TCPWebLog"
 fi
-#download the source code from GitHub
+# download the source code from GitHub
 ssh root@$RPMHOST "su -c 'cd /home/makerpm && git clone git://github.com/fubralimited/TCPWebLog.git' makerpm"
 ssh root@$RPMHOST 'cp -uf /home/makerpm/TCPWebLog/client/tcpweblog_client.spec /home/makerpm/rpmbuild/SPECS/'
 ssh root@$RPMHOST 'export SUVER=$(cat /home/makerpm/TCPWebLog/VERSION) && cd /home/makerpm/TCPWebLog/client && tar -zcvf /home/makerpm/rpmbuild/SOURCES/tcpweblog_client-$SUVER.tar.gz *'
@@ -235,11 +235,11 @@ if ssh root@$RPMHOST 'ls /home/makerpm/LogPipe >/dev/null'; then
 	# delete old dir
 	ssh root@$RPMHOST "rm -rf /home/makerpm/LogPipe"
 fi
-#download the source code from GitHub
+# download the source code from GitHub
 ssh root@$RPMHOST "su -c 'cd /home/makerpm && git clone git://github.com/fubralimited/LogPipe.git' makerpm"
-ssh root@$RPMHOST "su -c 'cd /home/makerpm/LogPipe && phpize' makerpm"
-ssh root@$RPMHOST "su -c 'cd /home/makerpm/LogPipe && ./configure --enable-logpipe' makerpm"
-ssh root@$RPMHOST "su -c 'cd /home/makerpm/LogPipe && make' makerpm"
+ssh root@$RPMHOST 'cp -uf /home/makerpm/LogPipe/logpipe.spec /home/makerpm/rpmbuild/SPECS/'
+ssh root@$RPMHOST 'export SUVER=$(cat /home/makerpm/LogPipe/VERSION) && cd /home/makerpm/LogPipe && tar -zcvf /home/makerpm/rpmbuild/SOURCES/logpipe-$SUVER.tar.gz *'
+ssh root@$RPMHOST "su -c 'cd /home/makerpm/rpmbuild/SPECS/ && rpmbuild -ba logpipe.spec' makerpm"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -252,17 +252,13 @@ echo "\n* Download files and update GIT ...\n"
 KVER=$(ssh root@$RPMHOST 'echo $(uname -r)')
 
 # create dir if not exist
-mkdir -p $GITROOT/CatN-Repo/CentOS/$KVER/LogPipe
+mkdir -p $GITROOT/CatN-Repo/CentOS/$KVER
 
 # get the files
 scp root@$RPMHOST:/home/makerpm/rpmbuild/RPMS/x86_64/* $GITROOT/CatN-Repo/CentOS/$KVER
 
 # remove local files
 ssh root@$RPMHOST 'rm -rf /home/makerpm/rpmbuild/RPMS/x86_64/*'
-
-# copy LogPipe files
-scp root@$RPMHOST:/home/makerpm/LogPipe/logpipe.ini $GITROOT/CatN-Repo/CentOS/$KVER/LogPipe/logpipe.ini
-scp root@$RPMHOST:/home/makerpm/LogPipe/modules/logpipe.so $GITROOT/CatN-Repo/CentOS/$KVER/LogPipe/logpipe.so
 
 # update git
 cd $GITROOT/CatN-Repo
