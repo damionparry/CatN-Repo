@@ -1,0 +1,10 @@
+##
+# Latest versions (Ansible format)
+#
+
+versions:
+	kernel: 3.2.0-29-generic
+	sqlite: 3.7.13-1.el6.x86_64
+	serverusage: 
+	tcpweblog: 
+	logpipe: 

@@ -3,8 +3,8 @@
 #==============================================================================+
 # File name   : updaterpm.sh
 # Begin       : 2012-06-11
-# Last Update : 2012-08-21
-# Version     : 1.6.0
+# Last Update : 2012-09-03
+# Version     : 1.7.0
 #
 # Description : This script rebuilds some RPM packages used on CatN Lab.
 #               To run this script you need a Virtual Machine (or physical 
@@ -61,7 +61,7 @@ SQLITEVER=3.7.13
 SQLITEFILEVER=3071300
 
 # reboot time
-REBOOTTIME=60
+REBOOTTIME=40
 
 # GIT root
 GITROOT=~/DATA/GIT
@@ -132,6 +132,19 @@ else
 	ssh root@$RPMHOST "su -c 'rpmdev-setuptree' makerpm"
 fi
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# *** store latest versions on a text file ***
+
+ssh root@$RPMHOST "rm -rf /home/makerpm/CatNRepoLatestVersions.yml"
+ssh root@$RPMHOST "touch /home/makerpm/CatNRepoLatestVersions.yml"
+ssh root@$RPMHOST "echo '##' >> /home/makerpm/CatNRepoLatestVersions.yml"
+ssh root@$RPMHOST "echo '# Latest versions (Ansible format)' >> /home/makerpm/CatNRepoLatestVersions.yml"
+ssh root@$RPMHOST "echo '#' >> /home/makerpm/CatNRepoLatestVersions.yml"
+ssh root@$RPMHOST "echo '' >> /home/makerpm/CatNRepoLatestVersions.yml"
+ssh root@$RPMHOST "echo 'versions:' >> /home/makerpm/CatNRepoLatestVersions.yml"
+ssh root@$RPMHOST "echo '	kernel: '$(uname -r)'' >> /home/makerpm/CatNRepoLatestVersions.yml"
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 # *** SQLite ***
@@ -144,6 +157,8 @@ scp sqlite.spec root@$RPMHOST:/home/makerpm/rpmbuild/SPECS/sqlite.spec
 # build the RPM packages
 ssh root@$RPMHOST "su -c 'cd /home/makerpm/rpmbuild/SPECS && QA_RPATHS=$[ 0x0001|0x0010 ] rpmbuild -ba sqlite.spec' makerpm"
 ssh root@$RPMHOST "rpm -U --force /home/makerpm/rpmbuild/RPMS/x86_64/sqlite-$SQLITEVER-1.el6.x86_64.rpm /home/makerpm/rpmbuild/RPMS/x86_64/sqlite-devel-$SQLITEVER-1.el6.x86_64.rpm"
+
+ssh root@$RPMHOST "echo '	sqlite: '$SQLITEVER'-1.el6.x86_64' >> /home/makerpm/CatNRepoLatestVersions.yml"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
@@ -200,6 +215,7 @@ ssh root@$RPMHOST "su -c 'cd /home/makerpm/rpmbuild/SPECS/ && rpmbuild -ba serve
 ssh root@$RPMHOST "su -c 'cd /home/makerpm/rpmbuild/SPECS/ && rpmbuild -ba serverusage_client.spec' makerpm"
 ssh root@$RPMHOST "su -c 'cd /home/makerpm/rpmbuild/SPECS/ && rpmbuild -ba serverusage_client_mdb.spec' makerpm"
 
+ssh root@$RPMHOST "export SUVER=$(cat /home/makerpm/ServerUsage/VERSION) && echo '	serverusage: '$SUVER'' >> /home/makerpm/CatNRepoLatestVersions.yml"
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -215,12 +231,14 @@ if ssh root@$RPMHOST 'ls /home/makerpm/TCPWebLog >/dev/null'; then
 fi
 # download the source code from GitHub
 ssh root@$RPMHOST "su -c 'cd /home/makerpm && git clone git://github.com/fubralimited/TCPWebLog.git' makerpm"
-ssh root@$RPMHOST 'cp -uf /home/makerpm/TCPWebLog/client/tcpweblog_client.spec /home/makerpm/rpmbuild/SPECS/'
-ssh root@$RPMHOST 'export SUVER=$(cat /home/makerpm/TCPWebLog/VERSION) && cd /home/makerpm/TCPWebLog/client && tar -zcvf /home/makerpm/rpmbuild/SOURCES/tcpweblog_client-$SUVER.tar.gz *'
 ssh root@$RPMHOST 'cp -uf /home/makerpm/TCPWebLog/server/tcpweblog_server.spec /home/makerpm/rpmbuild/SPECS/'
 ssh root@$RPMHOST 'export SUVER=$(cat /home/makerpm/TCPWebLog/VERSION) && cd /home/makerpm/TCPWebLog/server && tar -zcvf /home/makerpm/rpmbuild/SOURCES/tcpweblog_server-$SUVER.tar.gz *'
-ssh root@$RPMHOST "su -c 'cd /home/makerpm/rpmbuild/SPECS/ && rpmbuild -ba tcpweblog_client.spec' makerpm"
+ssh root@$RPMHOST 'cp -uf /home/makerpm/TCPWebLog/client/tcpweblog_client.spec /home/makerpm/rpmbuild/SPECS/'
+ssh root@$RPMHOST 'export SUVER=$(cat /home/makerpm/TCPWebLog/VERSION) && cd /home/makerpm/TCPWebLog/client && tar -zcvf /home/makerpm/rpmbuild/SOURCES/tcpweblog_client-$SUVER.tar.gz *'
 ssh root@$RPMHOST "su -c 'cd /home/makerpm/rpmbuild/SPECS/ && rpmbuild -ba tcpweblog_server.spec' makerpm"
+ssh root@$RPMHOST "su -c 'cd /home/makerpm/rpmbuild/SPECS/ && rpmbuild -ba tcpweblog_client.spec' makerpm"
+
+ssh root@$RPMHOST "export SUVER=$(cat /home/makerpm/TCPWebLog/VERSION) && echo '	tcpweblog: '$SUVER'' >> /home/makerpm/CatNRepoLatestVersions.yml"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
@@ -241,6 +259,8 @@ ssh root@$RPMHOST 'cp -uf /home/makerpm/LogPipe/logpipe.spec /home/makerpm/rpmbu
 ssh root@$RPMHOST 'export SUVER=$(cat /home/makerpm/LogPipe/VERSION) && cd /home/makerpm/LogPipe && tar -zcvf /home/makerpm/rpmbuild/SOURCES/logpipe-$SUVER.tar.gz *'
 ssh root@$RPMHOST "su -c 'cd /home/makerpm/rpmbuild/SPECS/ && rpmbuild -ba logpipe.spec' makerpm"
 
+ssh root@$RPMHOST "export SUVER=$(cat /home/makerpm/LogPipe/VERSION) && echo '	logpipe: '$SUVER'' >> /home/makerpm/CatNRepoLatestVersions.yml"
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # ..............................................................................
@@ -253,6 +273,9 @@ KVER=$(ssh root@$RPMHOST 'echo $(uname -r)')
 
 # create dir if not exist
 mkdir -p $GITROOT/CatN-Repo/CentOS/$KVER
+
+# copy the file containing the latest versions
+scp root@$RPMHOST:/home/makerpm/CatNRepoLatestVersions.yml $GITROOT/CatN-Repo/CentOS/
 
 # get the files
 scp root@$RPMHOST:/home/makerpm/rpmbuild/RPMS/x86_64/* $GITROOT/CatN-Repo/CentOS/$KVER
