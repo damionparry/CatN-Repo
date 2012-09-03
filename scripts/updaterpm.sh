@@ -143,7 +143,10 @@ ssh root@$RPMHOST "echo '# Latest versions (Ansible format)' >> /home/makerpm/Ca
 ssh root@$RPMHOST "echo '#' >> /home/makerpm/CatNRepoLatestVersions.yml"
 ssh root@$RPMHOST "echo '' >> /home/makerpm/CatNRepoLatestVersions.yml"
 ssh root@$RPMHOST "echo 'versions:' >> /home/makerpm/CatNRepoLatestVersions.yml"
-ssh root@$RPMHOST "echo '	kernel: '$(uname -r)'' >> /home/makerpm/CatNRepoLatestVersions.yml"
+
+# get the kernel version
+KVER=$(ssh root@$RPMHOST 'echo $(uname -r)')
+ssh root@$RPMHOST "echo '	kernel: '$KVER'' >> /home/makerpm/CatNRepoLatestVersions.yml"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
@@ -215,7 +218,10 @@ ssh root@$RPMHOST "su -c 'cd /home/makerpm/rpmbuild/SPECS/ && rpmbuild -ba serve
 ssh root@$RPMHOST "su -c 'cd /home/makerpm/rpmbuild/SPECS/ && rpmbuild -ba serverusage_client.spec' makerpm"
 ssh root@$RPMHOST "su -c 'cd /home/makerpm/rpmbuild/SPECS/ && rpmbuild -ba serverusage_client_mdb.spec' makerpm"
 
-ssh root@$RPMHOST "export SUVER=$(cat /home/makerpm/ServerUsage/VERSION) && echo '	serverusage: '$SUVER'' >> /home/makerpm/CatNRepoLatestVersions.yml"
+# get the version
+SUVER=$(ssh root@$RPMHOST 'echo $(cat /home/makerpm/ServerUsage/VERSION)')
+ssh root@$RPMHOST "echo '	serverusage: '$SUVER'' >> /home/makerpm/CatNRepoLatestVersions.yml"
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -238,7 +244,9 @@ ssh root@$RPMHOST 'export SUVER=$(cat /home/makerpm/TCPWebLog/VERSION) && cd /ho
 ssh root@$RPMHOST "su -c 'cd /home/makerpm/rpmbuild/SPECS/ && rpmbuild -ba tcpweblog_server.spec' makerpm"
 ssh root@$RPMHOST "su -c 'cd /home/makerpm/rpmbuild/SPECS/ && rpmbuild -ba tcpweblog_client.spec' makerpm"
 
-ssh root@$RPMHOST "export SUVER=$(cat /home/makerpm/TCPWebLog/VERSION) && echo '	tcpweblog: '$SUVER'' >> /home/makerpm/CatNRepoLatestVersions.yml"
+# get the version
+TLVER=$(ssh root@$RPMHOST 'echo $(cat /home/makerpm/TCPWebLog/VERSION)')
+ssh root@$RPMHOST "echo '	tcpweblog: '$TLVER'' >> /home/makerpm/CatNRepoLatestVersions.yml"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
@@ -259,7 +267,9 @@ ssh root@$RPMHOST 'cp -uf /home/makerpm/LogPipe/logpipe.spec /home/makerpm/rpmbu
 ssh root@$RPMHOST 'export SUVER=$(cat /home/makerpm/LogPipe/VERSION) && cd /home/makerpm/LogPipe && tar -zcvf /home/makerpm/rpmbuild/SOURCES/logpipe-$SUVER.tar.gz *'
 ssh root@$RPMHOST "su -c 'cd /home/makerpm/rpmbuild/SPECS/ && rpmbuild -ba logpipe.spec' makerpm"
 
-ssh root@$RPMHOST "export SUVER=$(cat /home/makerpm/LogPipe/VERSION) && echo '	logpipe: '$SUVER'' >> /home/makerpm/CatNRepoLatestVersions.yml"
+# get the version
+LPVER=$(ssh root@$RPMHOST 'echo $(cat /home/makerpm/LogPipe/VERSION)')
+ssh root@$RPMHOST "echo '	logpipe: '$LPVER'' >> /home/makerpm/CatNRepoLatestVersions.yml"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -267,9 +277,6 @@ ssh root@$RPMHOST "export SUVER=$(cat /home/makerpm/LogPipe/VERSION) && echo '	l
 # ..............................................................................
 
 echo "\n* Download files and update GIT ...\n"
-
-# get the kernel version
-KVER=$(ssh root@$RPMHOST 'echo $(uname -r)')
 
 # create dir if not exist
 mkdir -p $GITROOT/CatN-Repo/CentOS/$KVER

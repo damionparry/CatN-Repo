@@ -3,8 +3,8 @@
 #
 
 versions:
-	kernel: 3.2.0-29-generic
+	kernel: 2.6.32-279.5.2.el6.x86_64
 	sqlite: 3.7.13-1.el6.x86_64
-	serverusage: 
-	tcpweblog: 
-	logpipe: 
+	serverusage: 6.3.1
+	tcpweblog: 3.2.0
+	logpipe: 1.2.0
