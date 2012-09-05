@@ -8,13 +8,20 @@ version:
 	ver_machine: x86_64
 	ver_ext: 1.el6.x86_64.rpm
 	ver_sqlite: 3.7.13
-	rpm_sqlite: https://github.com/fubralimited/CatN-Repo/blob/master/CentOS/2.6.32-279.5.2.el6.x86_64/sqlite-3.7.13-1.el6.x86_64.rpm?raw=true
+	rpmurl_sqlite: https://github.com/fubralimited/CatN-Repo/blob/master/CentOS/2.6.32-279.5.2.el6.x86_64/sqlite-3.7.13-1.el6.x86_64.rpm?raw=true
+	rpm_sqlite: sqlite-3.7.13-1.el6.x86_64.rpm
 	ver_serverusage: 6.3.1
-	rpm_serverusage_server: https://github.com/fubralimited/CatN-Repo/blob/master/CentOS/2.6.32-279.5.2.el6.x86_64/serverusage_server-6.3.1-1.el6.x86_64.rpm?raw=true
-	rpm_serverusage_client: https://github.com/fubralimited/CatN-Repo/blob/master/CentOS/2.6.32-279.5.2.el6.x86_64/serverusage_client-6.3.1-1.el6.x86_64.rpm?raw=true
-	rpm_serverusage_client_mdb: https://github.com/fubralimited/CatN-Repo/blob/master/CentOS/2.6.32-279.5.2.el6.x86_64/serverusage_client_mdb-6.3.1-1.el6.x86_64.rpm?raw=true
+	rpmurl_serverusage_server: https://github.com/fubralimited/CatN-Repo/blob/master/CentOS/2.6.32-279.5.2.el6.x86_64/serverusage_server-6.3.1-1.el6.x86_64.rpm?raw=true
+	rpm_serverusage_server: serverusage_server-6.3.1-1.el6.x86_64.rpm
+	rpmurl_serverusage_client: https://github.com/fubralimited/CatN-Repo/blob/master/CentOS/2.6.32-279.5.2.el6.x86_64/serverusage_client-6.3.1-1.el6.x86_64.rpm?raw=true
+	rpm_serverusage_client: serverusage_client-6.3.1-1.el6.x86_64.rpm
+	rpmurl_serverusage_client_mdb: https://github.com/fubralimited/CatN-Repo/blob/master/CentOS/2.6.32-279.5.2.el6.x86_64/serverusage_client_mdb-6.3.1-1.el6.x86_64.rpm?raw=true
+	rpm_serverusage_client_mdb: serverusage_client_mdb-6.3.1-1.el6.x86_64.rpm
 	ver_tcpweblog: 3.2.0
-	rpm_tcpweblog_server: https://github.com/fubralimited/CatN-Repo/blob/master/CentOS/2.6.32-279.5.2.el6.x86_64/tcpweblog_server-3.2.0-1.el6.x86_64.rpm?raw=true
-	rpm_tcpweblog_client: https://github.com/fubralimited/CatN-Repo/blob/master/CentOS/2.6.32-279.5.2.el6.x86_64/tcpweblog_client-3.2.0-1.el6.x86_64.rpm?raw=true
+	rpmurl_tcpweblog_server: https://github.com/fubralimited/CatN-Repo/blob/master/CentOS/2.6.32-279.5.2.el6.x86_64/tcpweblog_server-3.2.0-1.el6.x86_64.rpm?raw=true
+	rpm_tcpweblog_server: tcpweblog_server-3.2.0-1.el6.x86_64.rpm
+	rpmurl_tcpweblog_client: https://github.com/fubralimited/CatN-Repo/blob/master/CentOS/2.6.32-279.5.2.el6.x86_64/tcpweblog_client-3.2.0-1.el6.x86_64.rpm?raw=true
+	rpm_tcpweblog_client: tcpweblog_client-3.2.0-1.el6.x86_64.rpm
 	ver_logpipe: 1.2.0
-	rpm_logpipe: https://github.com/fubralimited/CatN-Repo/blob/master/CentOS/2.6.32-279.5.2.el6.x86_64/logpipe-1.2.0-1.el6.x86_64.rpm?raw=true
+	rpmurl_logpipe: https://github.com/fubralimited/CatN-Repo/blob/master/CentOS/2.6.32-279.5.2.el6.x86_64/logpipe-1.2.0-1.el6.x86_64.rpm?raw=true
+	rpm_logpipe: logpipe-1.2.0-1.el6.x86_64.rpm
