@@ -299,8 +299,7 @@ ssh root@$RPMHOST "echo '    rpm_logpipe: logpipe-'$LPVER'-'$FVER'' >> /home/mak
 
 ssh root@$RPMHOST "rm -rf /home/makerpm/ansible"
 ssh root@$RPMHOST "su -c 'cd /home/makerpm && git clone --branch=yum-install-rpm git://github.com/dhozac/ansible.git' makerpm"
-ssh root@$RPMHOST "cd /home/makerpm/ansible"
-ssh root@$RPMHOST "make rpm"
+ssh root@$RPMHOST "su -c 'cd /home/makerpm/ansible && make rpm' makerpm"
 
 # ..............................................................................
 # ..............................................................................
