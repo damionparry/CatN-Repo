@@ -3,8 +3,8 @@
 #==============================================================================+
 # File name   : updaterpm.sh
 # Begin       : 2012-06-11
-# Last Update : 2012-09-05
-# Version     : 1.9.0
+# Last Update : 2012-09-13
+# Version     : 2.0.0
 #
 # Description : This script rebuilds some RPM packages used on CatN Lab.
 #               To run this script you need a Virtual Machine (or physical 
@@ -98,7 +98,7 @@ ssh root@$RPMHOST 'rpm -Uvh http://download.fedoraproject.org/pub/epel/6/$(uname
 
 # Install additional packages
 ssh root@$RPMHOST "yum -y groupinstall 'Development Tools'"
-ssh root@$RPMHOST 'yum -y install nano fedora-packager elfutils-devel kernel-devel dkms ncurses-devel readline-devel glibc-devel crash-devel rpm-devel nss-devel avahi-devel latex2html xmlto xmlto-tex publican publican-fedora gtkmm24-devel libglademm24-devel boost-devel dejagnu prelink nc socat glibc-devel glibc-devel.i686 php-devel openssl-devel MariaDB-devel'
+ssh root@$RPMHOST 'yum -y install nano fedora-packager elfutils-devel kernel-devel dkms ncurses-devel readline-devel glibc-devel crash-devel rpm-devel nss-devel avahi-devel latex2html xmlto xmlto-tex publican publican-fedora gtkmm24-devel libglademm24-devel boost-devel dejagnu prelink nc socat glibc-devel glibc-devel.i686 php-devel openssl-devel MariaDB-devel python2-devel'
 
 # download and install the latest debug modules for the current kernel
 if ssh root@$RPMHOST 'ls kernel-debug-debuginfo-$(uname -r).rpm >/dev/null'; then
@@ -142,7 +142,7 @@ ssh root@$RPMHOST "echo '##' >> /home/makerpm/CatNRepoLatestVersions.yml"
 ssh root@$RPMHOST "echo '# Latest versions (Ansible format)' >> /home/makerpm/CatNRepoLatestVersions.yml"
 ssh root@$RPMHOST "echo '#' >> /home/makerpm/CatNRepoLatestVersions.yml"
 ssh root@$RPMHOST "echo '' >> /home/makerpm/CatNRepoLatestVersions.yml"
-ssh root@$RPMHOST "echo 'version:' >> /home/makerpm/CatNRepoLatestVersions.yml"
+ssh root@$RPMHOST "echo 'catnrepo:' >> /home/makerpm/CatNRepoLatestVersions.yml"
 
 # get the kernel version
 KVER=$(ssh root@$RPMHOST 'echo $(uname -r)')
@@ -150,10 +150,10 @@ MVER=$(ssh root@$RPMHOST 'echo $(uname -m)')
 FVER="1.el6.$MVER.rpm"
 RDIR="https://github.com/fubralimited/CatN-Repo/blob/master/CentOS/$KVER/"
 
-ssh root@$RPMHOST "echo '	repo_dir: '$RDIR'' >> /home/makerpm/CatNRepoLatestVersions.yml"
-ssh root@$RPMHOST "echo '	ver_kernel: '$KVER'' >> /home/makerpm/CatNRepoLatestVersions.yml"
-ssh root@$RPMHOST "echo '	ver_machine: '$MVER'' >> /home/makerpm/CatNRepoLatestVersions.yml"
-ssh root@$RPMHOST "echo '	ver_ext: '$FVER'' >> /home/makerpm/CatNRepoLatestVersions.yml"
+ssh root@$RPMHOST "echo '    repo_dir: '$RDIR'' >> /home/makerpm/CatNRepoLatestVersions.yml"
+ssh root@$RPMHOST "echo '    ver_kernel: '$KVER'' >> /home/makerpm/CatNRepoLatestVersions.yml"
+ssh root@$RPMHOST "echo '    ver_machine: '$MVER'' >> /home/makerpm/CatNRepoLatestVersions.yml"
+ssh root@$RPMHOST "echo '    ver_ext: '$FVER'' >> /home/makerpm/CatNRepoLatestVersions.yml"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
@@ -168,9 +168,9 @@ scp sqlite.spec root@$RPMHOST:/home/makerpm/rpmbuild/SPECS/sqlite.spec
 ssh root@$RPMHOST "su -c 'cd /home/makerpm/rpmbuild/SPECS && QA_RPATHS=$[ 0x0001|0x0010 ] rpmbuild -ba sqlite.spec' makerpm"
 ssh root@$RPMHOST "rpm -U --force /home/makerpm/rpmbuild/RPMS/x86_64/sqlite-$SQLITEVER-1.el6.x86_64.rpm /home/makerpm/rpmbuild/RPMS/x86_64/sqlite-devel-$SQLITEVER-1.el6.x86_64.rpm"
 
-ssh root@$RPMHOST "echo '	ver_sqlite: '$SQLITEVER'' >> /home/makerpm/CatNRepoLatestVersions.yml"
-ssh root@$RPMHOST "echo '	rpmurl_sqlite: '$RDIR'sqlite-'$SQLITEVER'-'$FVER'?raw=true' >> /home/makerpm/CatNRepoLatestVersions.yml"
-ssh root@$RPMHOST "echo '	rpm_sqlite: sqlite-'$SQLITEVER'-'$FVER'' >> /home/makerpm/CatNRepoLatestVersions.yml"
+ssh root@$RPMHOST "echo '    ver_sqlite: '$SQLITEVER'' >> /home/makerpm/CatNRepoLatestVersions.yml"
+ssh root@$RPMHOST "echo '    rpmurl_sqlite: '$RDIR'sqlite-'$SQLITEVER'-'$FVER'?raw=true' >> /home/makerpm/CatNRepoLatestVersions.yml"
+ssh root@$RPMHOST "echo '    rpm_sqlite: sqlite-'$SQLITEVER'-'$FVER'' >> /home/makerpm/CatNRepoLatestVersions.yml"
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -228,13 +228,13 @@ ssh root@$RPMHOST "su -c 'cd /home/makerpm/rpmbuild/SPECS/ && rpmbuild -ba serve
 
 # get the version
 SUVER=$(ssh root@$RPMHOST 'echo $(cat /home/makerpm/ServerUsage/VERSION)')
-ssh root@$RPMHOST "echo '	ver_serverusage: '$SUVER'' >> /home/makerpm/CatNRepoLatestVersions.yml"
-ssh root@$RPMHOST "echo '	rpmurl_serverusage_server: '$RDIR'serverusage_server-'$SUVER'-'$FVER'?raw=true' >> /home/makerpm/CatNRepoLatestVersions.yml"
-ssh root@$RPMHOST "echo '	rpm_serverusage_server: serverusage_server-'$SUVER'-'$FVER'' >> /home/makerpm/CatNRepoLatestVersions.yml"
-ssh root@$RPMHOST "echo '	rpmurl_serverusage_client: '$RDIR'serverusage_client-'$SUVER'-'$FVER'?raw=true' >> /home/makerpm/CatNRepoLatestVersions.yml"
-ssh root@$RPMHOST "echo '	rpm_serverusage_client: serverusage_client-'$SUVER'-'$FVER'' >> /home/makerpm/CatNRepoLatestVersions.yml"
-ssh root@$RPMHOST "echo '	rpmurl_serverusage_client_mdb: '$RDIR'serverusage_client_mdb-'$SUVER'-'$FVER'?raw=true' >> /home/makerpm/CatNRepoLatestVersions.yml"
-ssh root@$RPMHOST "echo '	rpm_serverusage_client_mdb: serverusage_client_mdb-'$SUVER'-'$FVER'' >> /home/makerpm/CatNRepoLatestVersions.yml"
+ssh root@$RPMHOST "echo '    ver_serverusage: '$SUVER'' >> /home/makerpm/CatNRepoLatestVersions.yml"
+ssh root@$RPMHOST "echo '    rpmurl_serverusage_server: '$RDIR'serverusage_server-'$SUVER'-'$FVER'?raw=true' >> /home/makerpm/CatNRepoLatestVersions.yml"
+ssh root@$RPMHOST "echo '    rpm_serverusage_server: serverusage_server-'$SUVER'-'$FVER'' >> /home/makerpm/CatNRepoLatestVersions.yml"
+ssh root@$RPMHOST "echo '    rpmurl_serverusage_client: '$RDIR'serverusage_client-'$SUVER'-'$FVER'?raw=true' >> /home/makerpm/CatNRepoLatestVersions.yml"
+ssh root@$RPMHOST "echo '    rpm_serverusage_client: serverusage_client-'$SUVER'-'$FVER'' >> /home/makerpm/CatNRepoLatestVersions.yml"
+ssh root@$RPMHOST "echo '    rpmurl_serverusage_client_mdb: '$RDIR'serverusage_client_mdb-'$SUVER'-'$FVER'?raw=true' >> /home/makerpm/CatNRepoLatestVersions.yml"
+ssh root@$RPMHOST "echo '    rpm_serverusage_client_mdb: serverusage_client_mdb-'$SUVER'-'$FVER'' >> /home/makerpm/CatNRepoLatestVersions.yml"
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -259,11 +259,11 @@ ssh root@$RPMHOST "su -c 'cd /home/makerpm/rpmbuild/SPECS/ && rpmbuild -ba tcpwe
 
 # get the version
 TLVER=$(ssh root@$RPMHOST 'echo $(cat /home/makerpm/TCPWebLog/VERSION)')
-ssh root@$RPMHOST "echo '	ver_tcpweblog: '$TLVER'' >> /home/makerpm/CatNRepoLatestVersions.yml"
-ssh root@$RPMHOST "echo '	rpmurl_tcpweblog_server: '$RDIR'tcpweblog_server-'$TLVER'-'$FVER'?raw=true' >> /home/makerpm/CatNRepoLatestVersions.yml"
-ssh root@$RPMHOST "echo '	rpm_tcpweblog_server: tcpweblog_server-'$TLVER'-'$FVER'' >> /home/makerpm/CatNRepoLatestVersions.yml"
-ssh root@$RPMHOST "echo '	rpmurl_tcpweblog_client: '$RDIR'tcpweblog_client-'$TLVER'-'$FVER'?raw=true' >> /home/makerpm/CatNRepoLatestVersions.yml"
-ssh root@$RPMHOST "echo '	rpm_tcpweblog_client: tcpweblog_client-'$TLVER'-'$FVER'' >> /home/makerpm/CatNRepoLatestVersions.yml"
+ssh root@$RPMHOST "echo '    ver_tcpweblog: '$TLVER'' >> /home/makerpm/CatNRepoLatestVersions.yml"
+ssh root@$RPMHOST "echo '    rpmurl_tcpweblog_server: '$RDIR'tcpweblog_server-'$TLVER'-'$FVER'?raw=true' >> /home/makerpm/CatNRepoLatestVersions.yml"
+ssh root@$RPMHOST "echo '    rpm_tcpweblog_server: tcpweblog_server-'$TLVER'-'$FVER'' >> /home/makerpm/CatNRepoLatestVersions.yml"
+ssh root@$RPMHOST "echo '    rpmurl_tcpweblog_client: '$RDIR'tcpweblog_client-'$TLVER'-'$FVER'?raw=true' >> /home/makerpm/CatNRepoLatestVersions.yml"
+ssh root@$RPMHOST "echo '    rpm_tcpweblog_client: tcpweblog_client-'$TLVER'-'$FVER'' >> /home/makerpm/CatNRepoLatestVersions.yml"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
@@ -286,11 +286,20 @@ ssh root@$RPMHOST "su -c 'cd /home/makerpm/rpmbuild/SPECS/ && rpmbuild -ba logpi
 
 # get the version
 LPVER=$(ssh root@$RPMHOST 'echo $(cat /home/makerpm/LogPipe/VERSION)')
-ssh root@$RPMHOST "echo '	ver_logpipe: '$LPVER'' >> /home/makerpm/CatNRepoLatestVersions.yml"
-ssh root@$RPMHOST "echo '	rpmurl_logpipe: '$RDIR'logpipe-'$LPVER'-'$FVER'?raw=true' >> /home/makerpm/CatNRepoLatestVersions.yml"
-ssh root@$RPMHOST "echo '	rpm_logpipe: logpipe-'$LPVER'-'$FVER'' >> /home/makerpm/CatNRepoLatestVersions.yml"
+ssh root@$RPMHOST "echo '    ver_logpipe: '$LPVER'' >> /home/makerpm/CatNRepoLatestVersions.yml"
+ssh root@$RPMHOST "echo '    rpmurl_logpipe: '$RDIR'logpipe-'$LPVER'-'$FVER'?raw=true' >> /home/makerpm/CatNRepoLatestVersions.yml"
+ssh root@$RPMHOST "echo '    rpm_logpipe: logpipe-'$LPVER'-'$FVER'' >> /home/makerpm/CatNRepoLatestVersions.yml"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+# *** Ansible ***
+
+ssh root@$RPMHOST "su -c 'cd /home/makerpm && git clone --branch=yum-install-rpm git://github.com/ansible/ansible.git' makerpm"
+ssh root@$RPMHOST "cd /home/makerpm/ansible"
+ssh root@$RPMHOST "su -c 'make rpm' makerpm"
 
 # ..............................................................................
 # ..............................................................................
@@ -302,6 +311,8 @@ mkdir -p $GITROOT/CatN-Repo/CentOS/$KVER
 
 # copy the file containing the latest versions
 scp root@$RPMHOST:/home/makerpm/CatNRepoLatestVersions.yml $GITROOT/CatN-Repo/CentOS/
+
+scp root@$RPMHOST:/home/makerpm/ansible/rpm-build/ansible-*.noarch.rpm $GITROOT/CatN-Repo/CentOS/$KVER
 
 # get the files
 scp root@$RPMHOST:/home/makerpm/rpmbuild/RPMS/x86_64/* $GITROOT/CatN-Repo/CentOS/$KVER
