@@ -3,7 +3,7 @@
 #==============================================================================+
 # File name   : updaterpm.sh
 # Begin       : 2012-06-11
-# Last Update : 2012-09-13
+# Last Update : 2012-09-14
 # Version     : 2.0.0
 #
 # Description : This script rebuilds some RPM packages used on CatN Lab.
@@ -298,7 +298,7 @@ ssh root@$RPMHOST "echo '    rpm_logpipe: logpipe-'$LPVER'-'$FVER'' >> /home/mak
 # *** Ansible ***
 
 ssh root@$RPMHOST "rm -rf /home/makerpm/ansible"
-ssh root@$RPMHOST "su -c 'cd /home/makerpm && git clone --branch=yum-install-rpm git://github.com/dhozac/ansible.git' makerpm"
+ssh root@$RPMHOST "su -c 'cd /home/makerpm && git clone git://github.com/ansible/ansible.git' makerpm"
 ssh root@$RPMHOST "su -c 'cd /home/makerpm/ansible && make rpm' makerpm"
 
 # ..............................................................................
