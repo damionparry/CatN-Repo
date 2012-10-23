@@ -98,7 +98,7 @@ ssh root@$RPMHOST 'rpm -Uvh http://download.fedoraproject.org/pub/epel/6/$(uname
 
 # Install additional packages
 ssh root@$RPMHOST "yum -y groupinstall 'Development Tools'"
-ssh root@$RPMHOST 'yum -y install nano fedora-packager elfutils-devel kernel-devel dkms ncurses-devel readline-devel glibc-devel crash-devel rpm-devel nss-devel avahi-devel latex2html xmlto xmlto-tex publican publican-fedora gtkmm24-devel libglademm24-devel boost-devel dejagnu prelink nc socat glibc-devel glibc-devel.i686 php-devel openssl-devel MariaDB-devel python2-devel python python-paramiko python-jinja2 python-babel PyYAML python-pip python-argparse'
+ssh root@$RPMHOST 'yum -y install nano fedora-packager elfutils-devel kernel-devel dkms ncurses-devel readline-devel glibc-devel crash-devel rpm-devel nss-devel avahi-devel latex2html xmlto xmlto-tex publican publican-fedora gtkmm24-devel libglademm24-devel boost-devel dejagnu prelink nc socat glibc-devel glibc-devel.i686 php-devel openssl-devel MariaDB-devel python2-devel python python-paramiko python-jinja2 python-babel PyYAML python-pip python-argparse asciidoc'
 
 # download and install the latest debug modules for the current kernel
 if ssh root@$RPMHOST 'ls kernel-debug-debuginfo-$(uname -r).rpm >/dev/null'; then
