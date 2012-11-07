@@ -3,8 +3,8 @@
 #==============================================================================+
 # File name   : updaterpm.sh
 # Begin       : 2012-06-11
-# Last Update : 2012-10-10
-# Version     : 2.0.0
+# Last Update : 2012-11-07
+# Version     : 3.0.0
 #
 # Description : This script rebuilds some RPM packages used on CatN Lab.
 #               To run this script you need a Virtual Machine (or physical 
@@ -60,6 +60,9 @@ SQLITEVER=3.7.13
 # SQLite autoconf source file version
 SQLITEFILEVER=3071300
 
+# pure-FTPd version (update also the sqlite.spec file)
+PUREFTPDVER=1.0.36
+
 # reboot time
 REBOOTTIME=40
 
@@ -98,7 +101,7 @@ ssh root@$RPMHOST 'rpm -Uvh http://download.fedoraproject.org/pub/epel/6/$(uname
 
 # Install additional packages
 ssh root@$RPMHOST "yum -y groupinstall 'Development Tools'"
-ssh root@$RPMHOST 'yum -y install nano fedora-packager elfutils-devel kernel-devel dkms ncurses-devel readline-devel glibc-devel crash-devel rpm-devel nss-devel avahi-devel latex2html xmlto xmlto-tex publican publican-fedora gtkmm24-devel libglademm24-devel boost-devel dejagnu prelink nc socat glibc-devel glibc-devel.i686 php-devel openssl-devel MariaDB-devel python2-devel python python-paramiko python-jinja2 python-babel PyYAML python-pip python-argparse asciidoc'
+ssh root@$RPMHOST 'yum -y install nano fedora-packager elfutils-devel kernel-devel dkms ncurses-devel readline-devel glibc-devel crash-devel rpm-devel nss-devel avahi-devel latex2html xmlto xmlto-tex publican publican-fedora gtkmm24-devel libglademm24-devel boost-devel dejagnu prelink nc socat glibc-devel glibc-devel.i686 php-devel openssl-devel MariaDB-devel python2-devel python python-paramiko python-jinja2 python-babel PyYAML python-pip python-argparse asciidoc mysql-devel pam-devel libcap-devel openldap-devel postgresql-devel'
 
 # download and install the latest debug modules for the current kernel
 if ssh root@$RPMHOST 'ls kernel-debug-debuginfo-$(uname -r).rpm >/dev/null'; then
@@ -302,6 +305,27 @@ ssh root@$RPMHOST "su -c 'cd /home/makerpm && git clone git://github.com/ansible
 ssh root@$RPMHOST "su -c 'cd /home/makerpm/ansible && make rpm' makerpm"
 
 # ..............................................................................
+
+# *** pure-FTPd ***
+
+
+echo "\n* pure-FTPd ...\n"
+# download source 
+ssh root@$RPMHOST "su -c 'wget -O /home/makerpm/rpmbuild/SOURCES/pure-ftpd-$PUREFTPDVER.tar.bz2 http://download.pureftpd.org/pub/pure-ftpd/releases/pure-ftpd-$PUREFTPDVER.tar.bz2' makerpm"
+# upload spec and config file
+scp pure-ftpd-spec.tar.gz root@$RPMHOST:/home/makerpm/rpmbuild/SOURCES/pure-ftpd-spec.tar.gz
+ssh root@$RPMHOST "su -c 'cd /home/makerpm/rpmbuild/SOURCES/ && tar -zxvf pure-ftpd-spec.tar.gz' makerpm"
+# build the RPM packages
+ssh root@$RPMHOST "su -c 'cd /home/makerpm/rpmbuild/SOURCES/ && rpmbuild --bb pure-ftpd.spec' makerpm"
+
+ssh root@$RPMHOST "echo '    ver_pureftpd: '$PUREFTPDVER'' >> /home/makerpm/CatNRepoLatestVersions.yml"
+ssh root@$RPMHOST "echo '    rpmurl_pureftpd: '$RDIR'pure-ftpd-'$PUREFTPDVER'-'$FVER'?raw=true' >> /home/makerpm/CatNRepoLatestVersions.yml"
+ssh root@$RPMHOST "echo '    rpm_pureftpd: pure-ftpd-'$PUREFTPDVER'-'$FVER'' >> /home/makerpm/CatNRepoLatestVersions.yml"
+
+ssh root@$RPMHOST "echo '    ver_pureftpd_selinux: '$PUREFTPDVER'' >> /home/makerpm/CatNRepoLatestVersions.yml"
+ssh root@$RPMHOST "echo '    rpmurl_pureftpd_selinux: '$RDIR'pure-ftpd-selinux-'$PUREFTPDVER'-'$FVER'?raw=true' >> /home/makerpm/CatNRepoLatestVersions.yml"
+ssh root@$RPMHOST "echo '    rpm_pureftpd_selinux: pure-ftpd-selinux-'$PUREFTPDVER'-'$FVER'' >> /home/makerpm/CatNRepoLatestVersions.yml"
+
 # ..............................................................................
 
 echo "\n* Download files and update GIT ...\n"

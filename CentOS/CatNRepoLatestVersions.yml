@@ -25,3 +25,9 @@ catnrepo:
     ver_logpipe: 1.2.0
     rpmurl_logpipe: https://github.com/fubralimited/CatN-Repo/blob/master/CentOS/2.6.32-279.11.1.el6.x86_64/logpipe-1.2.0-1.el6.x86_64.rpm?raw=true
     rpm_logpipe: logpipe-1.2.0-1.el6.x86_64.rpm
+    ver_pureftpd: 1.0.36
+    rpmurl_pureftpd: https://github.com/fubralimited/CatN-Repo/blob/master/CentOS/2.6.32-279.11.1.el6.x86_64/pure-ftpd-1.0.36-1.el6.x86_64.rpm?raw=true
+    rpm_pureftpd: pure-ftpd-1.0.36-1.el6.x86_64.rpm
+    ver_pureftpd_selinux: 1.0.36
+    rpmurl_pureftpd_selinux: https://github.com/fubralimited/CatN-Repo/blob/master/CentOS/2.6.32-279.11.1.el6.x86_64/pure-ftpd-selinux-1.0.36-1.el6.x86_64.rpm?raw=true
+    rpm_pureftpd_selinux: pure-ftpd-selinux-1.0.36-1.el6.x86_64.rpm
